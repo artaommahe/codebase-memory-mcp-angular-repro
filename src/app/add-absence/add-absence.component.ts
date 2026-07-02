@@ -9,7 +9,7 @@ export class AddAbsenceComponent {
   constructor(private readonly featureService: FeatureService) {}
 
   save(): void {
-    if (this.featureService.isEnabled('absence')) {
+    if (this.featureService.isEnabled('absence-v2')) {
       console.log('saved');
     }
   }
