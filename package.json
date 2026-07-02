@@ -1,0 +1,10 @@
+{
+  "name": "codebase-memory-mcp-angular-repro",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Minimal reproduction: Angular component sibling files merged into one File node",
+  "dependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0"
+  }
+}
