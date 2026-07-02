@@ -69,3 +69,21 @@ src/standalone/help.html
 - Treating component + template as one unit for **call-graph** purposes is reasonable (template event bindings usefully show up as callers). The bug is that the merged siblings also vanish from the **file** inventory that `search_code` and file-level queries operate on.
 
 The TypeScript files intentionally don't compile (no `node_modules`) — the indexer's tree-sitter parsing doesn't need them to.
+
+## Follow-up: `extension` corruption on merged nodes (requires git history)
+
+The `extension`/`file_path` mismatch from the summary (point 3) also reproduces here, but **only once the repo has git history**:
+
+1. Index the repo at the initial commit (`bbc0779`) → extensions are consistent with the surviving path (`add-absence.component.ts` → `.ts`, `badge.component.scss` → `.scss`).
+2. Add commits that touch the merged siblings separately (see history: one commit edits `add-absence.component.html`, one edits `badge.component.scss`, one edits `add-absence.component.ts`).
+3. Re-run `index_repository` (mode `full`) and query again:
+
+```
+src/app/add-absence/add-absence.component.ts   ""      <- was ".ts" before the history existed
+src/app/badge/badge.component.scss             ""      <- was ".scss"
+src/app/checkbox/checkbox.component.html       .html   <- unaffected (template path won the merge)
+src/app/checkbox/checkbox.component.spec.ts    .ts
+src/app/checkbox/checkbox.component.stories.ts .ts
+```
+
+Stable across repeated re-indexes. Only merged component nodes where a **non-template** sibling won are affected. On the large real-world repo the same class of nodes shows `extension: '.html'` with a `.ts`/`.scss` `file_path` instead of an empty string — i.e. the value is environment/order-dependent, three different outcomes for the same logical situation.
